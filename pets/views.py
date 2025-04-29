@@ -33,6 +33,12 @@ class PetCreateView(CreateView):
             context['owner'] = get_object_or_404(Owner, pk=self.kwargs['owner_id'])
         return context
 
+    def form_valid(self, form):
+        """Ensure owner is set on the pet if owner_id is provided"""
+        if 'owner_id' in self.kwargs and not form.instance.owner_id:
+            form.instance.owner = get_object_or_404(Owner, pk=self.kwargs['owner_id'])
+        return super().form_valid(form)
+
     def get_success_url(self):
         """Redirect to owner detail page if pet was created from there"""
         if self.object.owner:
